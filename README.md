@@ -1,1 +1,13 @@
 "# SE2_16_173462_P" 
+PER ACCEDERE ALL'APPLICAZIONE COLLEGARSI A QUESTO SITO
+https://fathomless-inlet-80073.herokuapp.com 
+
+NON E' NECESSARIO AVVIARE /CREATE IN QUANTO IL DATABASE E' GIA STATO CREATO
+
+ACCOUNT CREATI, SE NE POSSONO CREARE ALTRI SE SI DESIDERA:
+-username: mohamed
+    password: dounnani
+-username: enrico
+    password: campa
+
+

@@ -1,0 +1,405 @@
+// LIBRERIE USATE
+var express = require('express');
+var bind = require('bind');
+var session = require('express-session')
+var pg = require('pg');
+var util = require('util');
+var bodyParser = require('body-parser');
+var app = express();
+
+app.set('port', (process.env.PORT || 5000));
+
+// BODY PARSER
+app.use(bodyParser.urlencoded({ extended: false }));
+
+
+//SESSION PER TENERE TRACCIA DEL USER ID
+app.use(session({ 
+	//required, used to prevent tampering
+	secret: 'string for the hash', 
+	//set time of validity of cookies
+	cookie: { maxAge: 60000 }
+}));
+
+
+// GET CHE GESTISCE LA PAGINA PRINCIPALE AL PRIMO AVVIO SE C'è GIA UNA SESSIONE ATTIVA MANDA AL LOGIN.TPL ALTRIMENTI MANDA ALLA PAGINA PRINCIPALE 
+app.get('/' , function(req,res){
+   	//check if the session exists
+	if (req.session.user_id != null) 
+	{
+    	 bind.toFile('login/login.tpl', {
+                        //set up parameters
+                        username: req.session.user_id                             
+                    }, 
+                            function(data) {
+                                
+                                res.end(data);
+                                
+                            });
+  	}
+	else
+	{
+		res.sendFile('home/home.html' , {root: __dirname})
+		
+	}
+});
+
+// POST CHE GESTISCE IL LOGOUT, DISTRUGGE SESSION USER ID CORRENTE E MANDA ALLA PAGINA PRINCIPALE
+app.use('/logout', function(request, response){
+	    request.session.user_id = null;
+    	response.sendFile('home/home.html' , {root: __dirname})
+		
+});
+
+
+// GET PER GLI  SCRIPT SIA DI CONTROLLO CHE USERMANAGER
+app.get('/userManager.js' , function(req,res){
+    res.sendFile('userManager.js' , {root: __dirname})
+    });
+app.get('/controlhome.js' , function(req,res){
+    res.sendFile('home/controlhome.js' , {root: __dirname})
+    });
+app.get('/controlreg.js' , function(req,res){
+    res.sendFile('registrazione/controlreg.js' , {root: __dirname})
+    });
+app.get('/controllo_pre_reg.js' , function(req,res){
+    res.sendFile('prenotazione/controllo_pre_reg.js' , {root: __dirname})
+    });
+app.get('/style.css', function(req,res){
+    res.sendFile('registrazione/style.css', {root: __dirname})
+});
+app.get('/immagine.png', function(req,res){
+    res.sendFile('img/immagine.png', {root: __dirname})
+});
+
+// POST CHE MANDA IN ESECUZIONE LA PAGINA DI REGISTRAZIONE
+app.use('/registrazione' , function(req,res){
+    res.sendFile('registrazione/registrazione.html' , {root: __dirname})
+    });
+
+
+// GET CHE CREA IL DATABASE LO ATTIVO SOLO UNA VOLTA, NON RIESCO A FARLO FUNZIONARE DA HEROKU PG:PSQL PER ORA LASCIO COSI
+app.get('/create/', function(request, response) {
+	response.writeHead(200, {'Content-Type': 'text/html'});	
+	console.log("called CREATE");
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+	var query_create='CREATE TABLE utente_registrato(id_utente INT,username text NOT NULL,password text,email text,PRIMARY KEY (username));CREATE TABLE bus (n_bus INT NOT NULL,orario text,posti_disponibili int,partenza text,destinazione text,PRIMARY KEY (n_bus));CREATE TABLE prenota(username text NOT NULL,n_bus INT NOT NULL,posto text,orario text,partenza text,destinazione text,PRIMARY KEY (username, n_bus),FOREIGN KEY (username) REFERENCES utente_registrato (username),FOREIGN KEY (n_bus) REFERENCES bus (n_bus));'
+		//create table	
+		client.query(query_create, function(err, result) {
+		  done();
+			
+		  if (err){ 
+			   console.error(err); 
+			   response.send("Errore " + err); 
+		   }
+		  else{ 
+			  response.end("table created");
+		   }
+		});
+
+  	});
+  	
+
+});
+
+
+// POST IN CUI SI CREANO ACCOUNT
+app.use('/register/', function(request, response) {
+	var username =request.body.username_reg;
+    var password=request.body.password_reg;
+    var email=request.body.email_reg;    
+    var test;
+	
+	console.log("called register");
+    
+    // FUNZIONE DI CALLBACK PER ESTRAPOLARE LA LUNGHEZZA DELLA TABELLA DA USARE COME USER_ID
+    findusername(username,function(test){
+    lunghezza(function(count){
+    if(!test){
+        response.writeHead(200, {'Content-Type': 'text/html'});
+    pg.connect(process.env.DATABASE_URL , function(err, client, done) {  
+		//add element
+        
+		client.query({text: 'insert into utente_registrato values ($1, $2, $3 , $4)',
+			values: [count,request.body.username_reg,request.body.password_reg,request.body.email_reg]}
+            , function(err, result) {
+		          done();
+                //PROVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                request.session.user_id=username;
+		          if (err) { 
+                      console.error(err); 
+                      response.send("Error insert " + err); 
+                  }
+		          else {
+                      	
+			         bind.toFile('login/login.tpl', {
+                        //set up parameters
+                        username: username                             
+                    }, function(data) {                                
+                                response.end(data);
+                                
+                            });
+		          }
+		      });
+  	});
+    }
+    else{
+        
+        response.redirect('/');
+    }
+              
+    });});
+
+});
+
+
+// POST PER LOGGARE DALLA PAGINA PRINCIPALE
+app.use('/login_home/', function(request, response) {	
+    	console.log("called LOGIN_HOME");
+	//check if the session exists
+	if (request.session.user_id != null) 
+	{
+        console.log("Ci entro mai qua?"+request.session.user_id);
+        bind.toFile('login/login.tpl', {
+                        //set up parameters
+                        username: request.session.user_id                            
+                    }, 
+                            function(data) {
+                                response.writeHead(200, {'Content-Type': 'text/html'});	
+                                response.end(data);
+                                
+                            });	
+  	}
+	else
+	{
+		//response.redirect('/my_secret_page');
+		pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
+            console.log("connected to login_home");
+
+            //add element
+            client.query({text: 'select username from utente_registrato where username=$1',                      
+                values: [request.body.username_input]}, function(err, result) {
+                done();
+                if (err) { 
+                  console.error(err); 
+                  response.send("Error insert " + err); }
+                else {
+                  if(result.rows.length>0){
+                  console.log(result.rows[0].username);
+                  request.session.user_id=result.rows[0].username;
+                  bind.toFile('login/login.tpl', {
+                            //set up parameters
+                            username: result.rows[0].username                           
+                        }, function(data) {
+                                    response.writeHead(200, {'Content-Type': 'text/html'});	
+                                    response.end(data);
+
+                                });
+                  }
+                  else{
+                    console.log("Heila");
+                    response.redirect('/');
+                  }
+
+               }
+            });
+  	});    
+    }
+	
+});
+ // POST PER LA PRENOTAZIONE CHE MANDA AD UNA PAGINA DOVE PUOI PRENOTARE UN VIAGGIO
+app.use('/prenotazione/', function(request, response) {
+	var text = "";
+    response.writeHead(200, {'Content-Type': 'text/html'});	
+	console.log("called prenotazione"+request.session.user_id);
+	//check if the session exists
+	create_table(function(table){
+        console.log("Table: "+table);
+		
+              bind.toFile('prenotazione/prenotazione_reg.tpl', {
+                        //set up parameters
+                        username: request.session.user_id,
+                        table : table
+                    }, 
+                            function(data) {
+                                
+                                response.end(data);
+                                
+                            });
+    });
+    
+           });
+
+//POST PER IMETTERE LA PRENOTAZIONE NEL DATABASE
+app.use('/prenotazione_effettuata/', function(request, response) {
+	var start =request.body.prenotazione_reg_start;
+    var date=request.body.prenotazione_reg_date;
+    var destination=request.body.prenotazione_reg_destination;
+    var posto = '';
+   	response.writeHead(200, {'Content-Type': 'text/html'});	
+	console.log("called prenotazione_effettuatA"+request.session.user_id);
+    prenota_values(start,destination,date,function(n_bus,orario){
+              pg.connect(process.env.DATABASE_URL , function(err, client, done) {		
+		          console.log("connected to db");                     
+		          //add element
+                    client.query({text: 'insert into prenota values ($1, $2, $3,$4,$5,$6)',
+                        values: [request.session.user_id ,n_bus,posto,orario,start,destination]}
+                        , function(err, result) {
+                      done();
+
+                      if (err) { 
+                          console.error(err); 
+                          response.send("Error insert " + err); }
+                      else {
+                           bind.toFile('prenotazione/prenotazione_effettuata.tpl', {
+                                    //set up parameters
+                                    username: request.session.user_id 
+
+                                }, 
+                                        function(data) {
+
+                                            response.end(data);
+
+                                        });
+                       }
+                    });
+  	});  });
+
+});
+
+//POST PER IMETTERE LA PRENOTAZIONE NEL DATABASE
+app.use('/my_prenotazioni/', function(request, response) {
+	var start =request.body.prenotazione_reg_start;
+    var date=request.body.prenotazione_reg_date;
+    var destination=request.body.prenotazione_reg_destination;
+    var posto = '';
+    var tabella="<table class=\"table\"><thead><tr><th>N_bus</th><th>Orario</th><th>N_posto</th><th>Partenza</th><th>Destinazione</th></tr></thead><tbody>";
+	response.writeHead(200, {'Content-Type': 'text/html'});	
+	console.log("called prenotazione_effettuata"); 
+    console.log("request.session.user_id"+request.session.user_id);
+    pg.connect(process.env.DATABASE_URL , function(err, client, done) {		
+        console.log("connected to db  my prenotazioni");       
+		//add element
+		client.query({text: 'select n_bus,orario,posto,partenza,destinazione from prenota where username=$1',
+			values: [request.session.user_id]}, function(err, result) {
+		      done();
+                for(i=0;i<result.rows.length;i++){
+                    tabella=tabella+"<tr><td><b>"+result.rows[i].n_bus+"</td><td><b>"+result.rows[i].orario+"</td><td><b>"+result.rows[i].posto+"</td><td><b>"+result.rows[i].partenza+"</td><td><b>"+result.rows[i].destinazione+"</td></tr>";
+                }
+            tabella=tabella+"</tbody></table>";
+		  if (err) { 
+			  console.error(err); 
+			  response.send("Error insert " + err); }
+		  else {
+			   bind.toFile('prenotazione/my_prenotazioni.tpl', {
+                        //set up parameters
+                        username: request.session.user_id,
+                        table: tabella
+                    }, 
+                            function(data) {
+                                
+                                response.end(data);
+                                
+                            });
+		   }
+		});
+  	});
+});
+
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});
+
+// FUNZIONE CHE CALCOLA QUANTI ELEMENTI CI SONO NEL DATABASE
+function lunghezza(callback) {
+    var count;
+    pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
+		console.log("connected to db2");
+        //add element
+		client.query('select * from utente_registrato', function(err, result) {
+		  done();
+          count = result.rows.length;
+          console.log(count);
+		  if (err) { 
+			  console.error(err); 
+			 }
+		  else {             
+			  callback(count);
+		   }
+		});
+  	});
+}
+
+//FUNZIONE CHE RESTITUISCE N_BUS ORARIO DOVE START DESTINATION E DATE RICHIESTI COINCIDONO CON IL BUS
+function prenota_values(start,destination,date,callback) {    
+        var n_bus;
+        var orario;
+        pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
+		console.log("connected to db3");
+        //add element
+        console.log("start: "+start+"destination: "+destination+" date: "+date);
+		client.query({text: 'select n_bus , orario from bus WHERE partenza = $1 and destinazione = $2 and orario = $3',
+			values: [start , destination, date]}, function(err, result) {
+		  done();
+          n_bus = result.rows[0].n_bus;
+          orario = result.rows[0].orario;
+          if (err) { 
+			  console.error(err); 
+			}
+		  else {              
+			  callback(n_bus,orario);
+		   }
+		});
+  	});    
+}
+
+//FUNZIONE CHE CREA GLI ORARI DEL BUS DA VISUALIZZARE IN TRIP PLANNER
+function create_table(callback){
+    
+    var text="<table class=\"table\"><thead><tr><th>N_bus</th><th>Orario</th><th>Posti_disponibili</th><th>partenza</th><th>destinazione</th></tr></thead><tbody>";
+    pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
+		console.log("connected to create table");
+        //add element
+        
+		client.query('select n_bus, orario , posti_disponibili, partenza , destinazione from bus ', function(err, result) {
+		  done();
+         for(i=0;i<result.rows.length;i++){
+             text=text+"<tr><td><b>"+result.rows[i].n_bus+"</td><td><b>"+result.rows[i].orario+"</td><td><b>"+result.rows[i].posti_disponibili+"</td><td><b>"+result.rows[i].partenza+"</td><td><b>"+result.rows[i].destinazione+"</td></tr>";
+         }
+            text=text+"</tbody></table>";
+		  if (err) { 
+			  console.error(err); 
+			  text=("Error insert " + err); 
+          }
+		  else{callback(text);}
+		});
+  	});
+    
+
+}
+
+function findusername(username,callback){    
+    console.log("funzioncina");
+    pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
+            console.log("connected to finusername");
+
+            //add element
+            client.query({text: 'select username from utente_registrato where username=$1',                      
+                values: [username]}, function(err, result) {
+                done();
+                if (err) { 
+                  console.error(err); 
+                  response.send("Error insert " + err); }
+                else {
+                  if(result.rows.length>0){
+                 callback(true);
+                  }
+                  else{
+                  callback(false);
+                  }
+
+               }
+            });
+  	});
+}
+  

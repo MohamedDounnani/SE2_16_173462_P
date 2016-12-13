@@ -1,0 +1,26 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "description": "\"# SE2_16_173462_P\" \r PER ACCEDERE ALL'APPLICAZIONE COLLEGARSI A QUESTO SITO\r https://fathomless-inlet-80073.herokuapp.com",
+  "main": "userManager.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MohamedDounnani/SE2_16_173462_P.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MohamedDounnani/SE2_16_173462_P/issues"
+  },
+  "homepage": "https://github.com/MohamedDounnani/SE2_16_173462_P#readme",
+  "dependencies": {
+    "bind": "^0.1.7",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "express-session": "^1.14.2",
+    "pg": "^6.1.1"
+  }
+}
