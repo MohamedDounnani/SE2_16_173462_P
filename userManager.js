@@ -18,7 +18,7 @@ app.use(session({
 	//required, used to prevent tampering
 	secret: 'string for the hash', 
 	//set time of validity of cookies
-	cookie: { maxAge: 60000 }
+	cookie: { maxAge: 1000000 }
 }));
 
 // GET PER GLI  SCRIPT DI CONTROLLO DI  USERMANAGER E DELL'IMMAGINE
