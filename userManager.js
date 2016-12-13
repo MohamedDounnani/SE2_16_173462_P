@@ -144,7 +144,7 @@ app.use('/register/', function(request, response) {
 });
 
 
-// POST PER LOGGARE DALLA PAGINA PRINCIPALE, SE C'è UNA SESSIONE ALLORA ANDANDO NELLA HOME RIMANE LA PROPRIA SESSIONE, SE NON C'è, SE SI PROVA A LOGGARE CON UN USERNAME O PASSWORD SBAGLIATI, SI VIENE RIMANDATI ALLA PAGINA PRINCIPALE , ALTRIMENTI LOGGA
+// POST PER LOGGARE DALLA PAGINA PRINCIPALE, SE C'è UNA SESSIONE ALLORA ANDANDO NELLA HOME RIMANE LA PROPRIA SESSIONE, SE NON C'è, SE SI PROVA A LOGGARE CON UN USERNAME SBAGLIATO, SI VIENE RIMANDATI ALLA PAGINA PRINCIPALE , ALTRIMENTI LOGGA
 app.use('/login_home/', function(request, response) {	
     	//check if the session exists
 	if (request.session.user_id != null) 
@@ -163,8 +163,8 @@ app.use('/login_home/', function(request, response) {
 	{
 		
 		pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-           client.query({text: 'select username , password from utente_registrato where username=$1 and password=$2'                      
-                values: [request.body.username_input , request.body.password_input]}, function(err, result) {
+           client.query({text: 'select username from utente_registrato where username=$1 and password=$1'                      
+                values: [request.body.username_input , request.body.password_input ]}, function(err, result) {
                 done();
                 if (err) { 
                   console.error(err); 
