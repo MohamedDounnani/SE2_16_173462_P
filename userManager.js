@@ -21,38 +21,7 @@ app.use(session({
 	cookie: { maxAge: 60000 }
 }));
 
-
-// GET CHE GESTISCE LA PAGINA PRINCIPALE AL PRIMO AVVIO SE C'è GIA UNA SESSIONE ATTIVA MANDA AL LOGIN.TPL ALTRIMENTI MANDA ALLA PAGINA PRINCIPALE 
-app.get('/' , function(req,res){
-   	//check if the session exists
-	if (req.session.user_id != null) 
-	{
-    	 bind.toFile('login/login.tpl', {
-                        //set up parameters
-                        username: req.session.user_id                             
-                    }, 
-                            function(data) {
-                                
-                                res.end(data);
-                                
-                            });
-  	}
-	else
-	{
-		res.sendFile('home/home.html' , {root: __dirname})
-		
-	}
-});
-
-// POST CHE GESTISCE IL LOGOUT, DISTRUGGE SESSION USER ID CORRENTE E MANDA ALLA PAGINA PRINCIPALE
-app.use('/logout', function(request, response){
-	    request.session.user_id = null;
-    	response.sendFile('home/home.html' , {root: __dirname})
-		
-});
-
-
-// GET PER GLI  SCRIPT SIA DI CONTROLLO CHE USERMANAGER
+// GET PER GLI  SCRIPT DI CONTROLLO DI  USERMANAGER E DELL'IMMAGINE
 app.get('/userManager.js' , function(req,res){
     res.sendFile('userManager.js' , {root: __dirname})
     });
@@ -78,10 +47,36 @@ app.use('/registrazione' , function(req,res){
     });
 
 
-// GET CHE CREA IL DATABASE LO ATTIVO SOLO UNA VOLTA, NON RIESCO A FARLO FUNZIONARE DA HEROKU PG:PSQL PER ORA LASCIO COSI
+// GET CHE GESTISCE LA PAGINA PRINCIPALE AL PRIMO AVVIO SE C'è GIA UNA SESSIONE ATTIVA MANDA AL LOGIN.TPL ALTRIMENTI MANDA ALLA PAGINA PRINCIPALE 
+app.get('/' , function(req,res){
+   	//check if the session exists
+	if (req.session.user_id != null) {
+    	 bind.toFile('login/login.tpl', {
+                        //set up parameters
+                        username: req.session.user_id                             
+                    }, function(data) {                                
+                                res.end(data);
+                                
+                            });
+  	}
+	else
+	{
+		res.sendFile('home/home.html' , {root: __dirname})
+		
+	}
+});
+
+// POST CHE GESTISCE IL LOGOUT, DISTRUGGE SESSION USER ID CORRENTE E MANDA ALLA PAGINA PRINCIPALE
+app.use('/logout', function(request, response){
+	    request.session.user_id = null;
+    	response.sendFile('home/home.html' , {root: __dirname})
+		
+});
+
+
+// GET CHE CREA IL DATABASE LO ATTIVO SOLO UNA VOLTA
 app.get('/create/', function(request, response) {
 	response.writeHead(200, {'Content-Type': 'text/html'});	
-	console.log("called CREATE");
 	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 	var query_create='CREATE TABLE utente_registrato(id_utente INT,username text NOT NULL,password text,email text,PRIMARY KEY (username));CREATE TABLE bus (n_bus INT NOT NULL,orario text,posti_disponibili int,partenza text,destinazione text,PRIMARY KEY (n_bus));CREATE TABLE prenota(username text NOT NULL,n_bus INT NOT NULL,posto text,orario text,partenza text,destinazione text,PRIMARY KEY (username, n_bus),FOREIGN KEY (username) REFERENCES utente_registrato (username),FOREIGN KEY (n_bus) REFERENCES bus (n_bus));'
 		//create table	
@@ -108,14 +103,12 @@ app.use('/register/', function(request, response) {
 	var username =request.body.username_reg;
     var password=request.body.password_reg;
     var email=request.body.email_reg;    
-    var test;
-	
-	console.log("called register");
-    
-    // FUNZIONE DI CALLBACK PER ESTRAPOLARE LA LUNGHEZZA DELLA TABELLA DA USARE COME USER_ID
-    findusername(username,function(test){
+    var username_exist;
+	    
+    //FUNZIONE CHE CONTROLLA SE CI SIA UN ALTRO ACCOUNT CON LO STESSO USERNAME, SE COSI FOSSE RIMANDA ALLA PAGINA PRINCIPALE + FUNZIONE DI CALLBACK PER //ESTRAPOLARE LA LUNGHEZZA DELLA TABELLA DA USARE COME USER_ID
+    findusername(username,function(username_exist){
     lunghezza(function(count){
-    if(!test){
+    if(!username_exist){
         response.writeHead(200, {'Content-Type': 'text/html'});
     pg.connect(process.env.DATABASE_URL , function(err, client, done) {  
 		//add element
@@ -124,7 +117,6 @@ app.use('/register/', function(request, response) {
 			values: [count,request.body.username_reg,request.body.password_reg,request.body.email_reg]}
             , function(err, result) {
 		          done();
-                //PROVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 request.session.user_id=username;
 		          if (err) { 
                       console.error(err); 
@@ -133,7 +125,6 @@ app.use('/register/', function(request, response) {
 		          else {
                       	
 			         bind.toFile('login/login.tpl', {
-                        //set up parameters
                         username: username                             
                     }, function(data) {                                
                                 response.end(data);
@@ -153,13 +144,11 @@ app.use('/register/', function(request, response) {
 });
 
 
-// POST PER LOGGARE DALLA PAGINA PRINCIPALE
+// POST PER LOGGARE DALLA PAGINA PRINCIPALE, SE C'è UNA SESSIONE ALLORA ANDANDO NELLA HOME RIMANE LA PROPRIA SESSIONE, SE NON C'è, SE SI PROVA A LOGGARE CON UN USERNAME O PASSWORD SBAGLIATI, SI VIENE RIMANDATI ALLA PAGINA PRINCIPALE , ALTRIMENTI LOGGA
 app.use('/login_home/', function(request, response) {	
-    	console.log("called LOGIN_HOME");
-	//check if the session exists
+    	//check if the session exists
 	if (request.session.user_id != null) 
 	{
-        console.log("Ci entro mai qua?"+request.session.user_id);
         bind.toFile('login/login.tpl', {
                         //set up parameters
                         username: request.session.user_id                            
@@ -172,13 +161,10 @@ app.use('/login_home/', function(request, response) {
   	}
 	else
 	{
-		//response.redirect('/my_secret_page');
+		
 		pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-            console.log("connected to login_home");
-
-            //add element
-            client.query({text: 'select username from utente_registrato where username=$1',                      
-                values: [request.body.username_input]}, function(err, result) {
+           client.query({text: 'select username from utente_registrato where username=$1 and password=$2,                      
+                values: [request.body.username_input , request.body.password_input]}, function(err, result) {
                 done();
                 if (err) { 
                   console.error(err); 
@@ -197,7 +183,6 @@ app.use('/login_home/', function(request, response) {
                                 });
                   }
                   else{
-                    console.log("Heila");
                     response.redirect('/');
                   }
 
@@ -209,14 +194,11 @@ app.use('/login_home/', function(request, response) {
 });
  // POST PER LA PRENOTAZIONE CHE MANDA AD UNA PAGINA DOVE PUOI PRENOTARE UN VIAGGIO
 app.use('/prenotazione/', function(request, response) {
-	var text = "";
-    response.writeHead(200, {'Content-Type': 'text/html'});	
+	response.writeHead(200, {'Content-Type': 'text/html'});	
 	console.log("called prenotazione"+request.session.user_id);
 	//check if the session exists
 	create_table(function(table){
-        console.log("Table: "+table);
-		
-              bind.toFile('prenotazione/prenotazione_reg.tpl', {
+                    bind.toFile('prenotazione/prenotazione_reg.tpl', {
                         //set up parameters
                         username: request.session.user_id,
                         table : table
@@ -237,10 +219,8 @@ app.use('/prenotazione_effettuata/', function(request, response) {
     var destination=request.body.prenotazione_reg_destination;
     var posto = '';
    	response.writeHead(200, {'Content-Type': 'text/html'});	
-	console.log("called prenotazione_effettuatA"+request.session.user_id);
-    prenota_values(start,destination,date,function(n_bus,orario){
-              pg.connect(process.env.DATABASE_URL , function(err, client, done) {		
-		          console.log("connected to db");                     
+	 prenota_values(start,destination,date,function(n_bus,orario){
+              pg.connect(process.env.DATABASE_URL , function(err, client, done) {		            
 		          //add element
                     client.query({text: 'insert into prenota values ($1, $2, $3,$4,$5,$6)',
                         values: [request.session.user_id ,n_bus,posto,orario,start,destination]}
@@ -275,10 +255,8 @@ app.use('/my_prenotazioni/', function(request, response) {
     var posto = '';
     var tabella="<table class=\"table\"><thead><tr><th>N_bus</th><th>Orario</th><th>N_posto</th><th>Partenza</th><th>Destinazione</th></tr></thead><tbody>";
 	response.writeHead(200, {'Content-Type': 'text/html'});	
-	console.log("called prenotazione_effettuata"); 
-    console.log("request.session.user_id"+request.session.user_id);
-    pg.connect(process.env.DATABASE_URL , function(err, client, done) {		
-        console.log("connected to db  my prenotazioni");       
+	 pg.connect(process.env.DATABASE_URL , function(err, client, done) {		
+        
 		//add element
 		client.query({text: 'select n_bus,orario,posto,partenza,destinazione from prenota where username=$1',
 			values: [request.session.user_id]}, function(err, result) {
@@ -314,8 +292,7 @@ app.listen(app.get('port'), function() {
 function lunghezza(callback) {
     var count;
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-		console.log("connected to db2");
-        //add element
+		//add element
 		client.query('select * from utente_registrato', function(err, result) {
 		  done();
           count = result.rows.length;
@@ -335,8 +312,7 @@ function prenota_values(start,destination,date,callback) {
         var n_bus;
         var orario;
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-		console.log("connected to db3");
-        //add element
+		//add element
         console.log("start: "+start+"destination: "+destination+" date: "+date);
 		client.query({text: 'select n_bus , orario from bus WHERE partenza = $1 and destinazione = $2 and orario = $3',
 			values: [start , destination, date]}, function(err, result) {
@@ -358,8 +334,7 @@ function create_table(callback){
     
     var text="<table class=\"table\"><thead><tr><th>N_bus</th><th>Orario</th><th>Posti_disponibili</th><th>partenza</th><th>destinazione</th></tr></thead><tbody>";
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-		console.log("connected to create table");
-        //add element
+		//add element
         
 		client.query('select n_bus, orario , posti_disponibili, partenza , destinazione from bus ', function(err, result) {
 		  done();
@@ -379,10 +354,7 @@ function create_table(callback){
 }
 
 function findusername(username,callback){    
-    console.log("funzioncina");
-    pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-            console.log("connected to finusername");
-
+        pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
             //add element
             client.query({text: 'select username from utente_registrato where username=$1',                      
                 values: [username]}, function(err, result) {
