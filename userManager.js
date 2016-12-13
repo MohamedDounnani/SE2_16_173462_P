@@ -163,8 +163,8 @@ app.use('/login_home/', function(request, response) {
 	{
 		
 		pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-           client.query({text: 'select username from utente_registrato where username=$1 and password=$1'                      
-                values: [request.body.username_input , request.body.password_input ]}, function(err, result) {
+           client.query({text: 'select username from utente_registrato where username=$1'                      
+                values: [request.body.username_input]}, function(err, result) {
                 done();
                 if (err) { 
                   console.error(err); 
