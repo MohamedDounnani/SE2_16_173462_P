@@ -1,6 +1,6 @@
 "# SE2_16_173462_P" 
 PER ACCEDERE ALL'APPLICAZIONE COLLEGARSI A QUESTO SITO
-https://fathomless-inlet-80073.herokuapp.com 
+ https://infinite-coast-33422.herokuapp.com/
 
 NON E' NECESSARIO AVVIARE /CREATE IN QUANTO IL DATABASE E' GIA STATO CREATO
 
