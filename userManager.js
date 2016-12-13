@@ -163,7 +163,7 @@ app.use('/login_home/', function(request, response) {
 	{
 		
 		pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-           client.query({text: 'select username from utente_registrato where username=$1 and password=$2'                      
+           client.query({text: 'select username , password from utente_registrato where username=$1 and password=$2'                      
                 values: [request.body.username_input , request.body.password_input]}, function(err, result) {
                 done();
                 if (err) { 
@@ -171,7 +171,6 @@ app.use('/login_home/', function(request, response) {
                   response.send("Error insert " + err); }
                 else {
                   if(result.rows.length>0){
-                  console.log(result.rows[0].username);
                   request.session.user_id=result.rows[0].username;
                   bind.toFile('login/login.tpl', {
                             //set up parameters
