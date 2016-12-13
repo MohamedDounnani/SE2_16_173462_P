@@ -1,4 +1,4 @@
-// LIBRERIE USATE
+// LIBRERIE UTILIZZATE
 var express = require('express');
 var bind = require('bind');
 var session = require('express-session')
@@ -20,8 +20,10 @@ app.use(session({
 	//set time of validity of cookies
 	cookie: { maxAge: 1000000 }
 }));
+/**
+ * @brief GET PER GLI  SCRIPT DI CONTROLLO DI  USERMANAGER E DELL'IMMAGINE 
+ */
 
-// GET PER GLI  SCRIPT DI CONTROLLO DI  USERMANAGER E DELL'IMMAGINE
 app.get('/userManager.js' , function(req,res){
     res.sendFile('userManager.js' , {root: __dirname})
     });
@@ -41,13 +43,18 @@ app.get('/immagine.png', function(req,res){
     res.sendFile('img/immagine.png', {root: __dirname})
 });
 
-// POST CHE MANDA IN ESECUZIONE LA PAGINA DI REGISTRAZIONE
+/**
+ * @brief POST CHE RICHIAMA LA PAGINA DI REGISTRAZIONE 
+ */
+
 app.use('/registrazione' , function(req,res){
     res.sendFile('registrazione/registrazione.html' , {root: __dirname})
     });
 
-
-// GET CHE GESTISCE LA PAGINA PRINCIPALE AL PRIMO AVVIO SE C'è GIA UNA SESSIONE ATTIVA MANDA AL LOGIN.TPL ALTRIMENTI MANDA ALLA PAGINA PRINCIPALE 
+/**
+ * @brief GET CHE GESTISCE LA PAGINA PRINCIPALE AL PRIMO AVVIO SE C'è GIA UNA SESSIONE ATTIVA MANDA AL LOGIN.TPL ALTRIMENTI MANDA ALLA PAGINA PRINCIPALE 
+ */
+ 
 app.get('/' , function(req,res){
    	//check if the session exists
 	if (req.session.user_id != null) {
@@ -65,21 +72,25 @@ app.get('/' , function(req,res){
 		
 	}
 });
+/**
+ * @brief POST CHE GESTISCE IL LOGOUT, DISTRUGGE SESSION USER ID CORRENTE E MANDA ALLA PAGINA PRINCIPALE 
+ */
 
-// POST CHE GESTISCE IL LOGOUT, DISTRUGGE SESSION USER ID CORRENTE E MANDA ALLA PAGINA PRINCIPALE
 app.use('/logout', function(request, response){
 	    request.session.user_id = null;
     	response.sendFile('home/home.html' , {root: __dirname})
 		
 });
 
+/**
+ * @brief GET CHE CREA IL DATABASE LO ATTIVO SOLO UNA VOLTA
+ */
 
-// GET CHE CREA IL DATABASE LO ATTIVO SOLO UNA VOLTA
 app.get('/create/', function(request, response) {
 	response.writeHead(200, {'Content-Type': 'text/html'});	
 	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
 	var query_create='CREATE TABLE utente_registrato(id_utente INT,username text NOT NULL,password text,email text,PRIMARY KEY (username));CREATE TABLE bus (n_bus INT NOT NULL,orario text,posti_disponibili int,partenza text,destinazione text,PRIMARY KEY (n_bus));CREATE TABLE prenota(username text NOT NULL,n_bus INT NOT NULL,posto text,orario text,partenza text,destinazione text,PRIMARY KEY (username, n_bus),FOREIGN KEY (username) REFERENCES utente_registrato (username),FOREIGN KEY (n_bus) REFERENCES bus (n_bus));'
-		//create table	
+			
 		client.query(query_create, function(err, result) {
 		  done();
 			
@@ -88,21 +99,25 @@ app.get('/create/', function(request, response) {
 			   response.send("Errore " + err); 
 		   }
 		  else{ 
+              //MESSAGGIO DI RISPOSTA
 			  response.end("table created");
 		   }
 		});
 
   	});
-  	
+ });
 
-});
+/**
+ * @brief POST IN CUI REGISTRA UN NUOVO ACCOUNT
+ */
 
-
-// POST IN CUI SI CREANO ACCOUNT
 app.use('/register/', function(request, response) {
+    // VARIABILI PER ESTRAPOLARE I FORM DATA
 	var username =request.body.username_reg;
     var password=request.body.password_reg;
-    var email=request.body.email_reg;    
+    var email=request.body.email_reg;   
+    
+    //VARIABILE USATA PER CONTROLLARE SE ESISTE GIA' UN USERNAME CON LO STESSO NOME DEL DATABASE
     var username_exist;
 	    
     //FUNZIONE CHE CONTROLLA SE CI SIA UN ALTRO ACCOUNT CON LO STESSO USERNAME, SE COSI FOSSE RIMANDA ALLA PAGINA PRINCIPALE + FUNZIONE DI CALLBACK PER //ESTRAPOLARE LA LUNGHEZZA DELLA TABELLA DA USARE COME USER_ID
@@ -143,8 +158,10 @@ app.use('/register/', function(request, response) {
 
 });
 
+/**
+ * @brief  POST PER LOGGARE DALLA PAGINA PRINCIPALE, SE C'è UNA SESSIONE ALLORA ANDANDO NELLA HOME RIMANE LA PROPRIA SESSIONE, SE NON C'è, SE SI PROVA A LOGGARE CON UN USERNAME SBAGLIATO, SI VIENE RIMANDATI ALLA PAGINA PRINCIPALE , ALTRIMENTI LOGGA
+ */
 
-// POST PER LOGGARE DALLA PAGINA PRINCIPALE, SE C'è UNA SESSIONE ALLORA ANDANDO NELLA HOME RIMANE LA PROPRIA SESSIONE, SE NON C'è, SE SI PROVA A LOGGARE CON UN USERNAME SBAGLIATO, SI VIENE RIMANDATI ALLA PAGINA PRINCIPALE , ALTRIMENTI LOGGA
 app.use('/login_home/', function(request, response) {	
     	//check if the session exists
 	if (request.session.user_id != null) 
@@ -191,7 +208,11 @@ app.use('/login_home/', function(request, response) {
     }
 	
 });
- // POST PER LA PRENOTAZIONE CHE MANDA AD UNA PAGINA DOVE PUOI PRENOTARE UN VIAGGIO
+
+/**
+ * @brief POST PER LA PRENOTAZIONE CHE MANDA AD UNA PAGINA DOVE PUOI PRENOTARE UN VIAGGIO
+ */
+ 
 app.use('/prenotazione/', function(request, response) {
 	response.writeHead(200, {'Content-Type': 'text/html'});	
 	console.log("called prenotazione"+request.session.user_id);
@@ -211,7 +232,10 @@ app.use('/prenotazione/', function(request, response) {
     
            });
 
-//POST PER IMETTERE LA PRENOTAZIONE NEL DATABASE
+/**
+ * @brief POST PER IMETTERE LA PRENOTAZIONE NEL DATABASE
+ */
+
 app.use('/prenotazione_effettuata/', function(request, response) {
 	var start =request.body.prenotazione_reg_start;
     var date=request.body.prenotazione_reg_date;
@@ -246,7 +270,10 @@ app.use('/prenotazione_effettuata/', function(request, response) {
 
 });
 
-//POST PER IMETTERE LA PRENOTAZIONE NEL DATABASE
+/**
+ * @brief POST PER VISUALIZZARE NELLA PAGINA TUTTE LE PROPRIE PRENOTAZIONI
+ */
+
 app.use('/my_prenotazioni/', function(request, response) {
 	var start =request.body.prenotazione_reg_start;
     var date=request.body.prenotazione_reg_date;
@@ -287,7 +314,11 @@ app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 
-// FUNZIONE CHE CALCOLA QUANTI ELEMENTI CI SONO NEL DATABASE
+/**
+ * @brief FUNZIONE CHE CALCOLA QUANTI ELEMENTI CI SONO NEL DATABASE
+ * @param FUNZIONE DI CALLBACK PER SINCRONIZZARE GLI ACCESSI AL DATABASE, RESTITUENDO IL NUMERO DI RIGHE DA USARE COME NUOVO ID
+ */
+
 function lunghezza(callback) {
     var count;
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
@@ -306,7 +337,12 @@ function lunghezza(callback) {
   	});
 }
 
-//FUNZIONE CHE RESTITUISCE N_BUS ORARIO DOVE START DESTINATION E DATE RICHIESTI COINCIDONO CON IL BUS
+/**
+ * @brief FUNZIONE CHE RESTITUISCE N_BUS ORARIO DOVE START DESTINATION E DATE RICHIESTI COINCIDONO CON IL BUS
+ * @param START, DESTINATION, DATE , CALLBACK
+ */
+
+
 function prenota_values(start,destination,date,callback) {    
         var n_bus;
         var orario;
@@ -327,14 +363,16 @@ function prenota_values(start,destination,date,callback) {
 		});
   	});    
 }
+/**
+ * @brief FUNZIONE CHE CREA GLI ORARI DEL BUS DA VISUALIZZARE IN TRIP PLANNER
+ * @param FUNZIONE DI CALBACK PER LA SINCRONIZZAZIONE DEL DATABASE
+ */
 
-//FUNZIONE CHE CREA GLI ORARI DEL BUS DA VISUALIZZARE IN TRIP PLANNER
 function create_table(callback){
     
     var text="<table class=\"table\"><thead><tr><th>N_bus</th><th>Orario</th><th>Posti_disponibili</th><th>partenza</th><th>destinazione</th></tr></thead><tbody>";
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
-		//add element
-        
+		        
 		client.query('select n_bus, orario , posti_disponibili, partenza , destinazione from bus ', function(err, result) {
 		  done();
          for(i=0;i<result.rows.length;i++){
@@ -351,6 +389,11 @@ function create_table(callback){
     
 
 }
+
+/**
+ * @brief FUNZIONE PER CERCARE UN USERNAME NEL DATABASE
+ * @param USERNAME DA CERCARE E FUNZIONE DI CALLBACK PER SINCRONIZZARE IL DATABASE
+ */
 
 function findusername(username,callback){    
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
