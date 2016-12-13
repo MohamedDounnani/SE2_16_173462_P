@@ -32,7 +32,7 @@ TEMPLATE QUANDO EFFETTUO LA PRENOTAZIONE DA REGISTRATO, UN SEMPLICE MESSAGGIO DI
     </div>
   </div>
 </nav><br><br>
-<div style="text-align: center"><h5 style="color: green">Prenotazione Effettuata, ora potrai visualizzare la tua prenotazione in My Trip Planner</h5></div>
+<div style="text-align: center"><h5 style="color: green"><b>Prenotazione Effettuata, ora potrai visualizzare la tua prenotazione in My Trip Planner</h5></div>
 
 
 </body>
