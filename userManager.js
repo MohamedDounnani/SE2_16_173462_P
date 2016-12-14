@@ -82,30 +82,7 @@ app.use('/logout', function(request, response){
 		
 });
 
-/**
- * @brief GET CHE CREA IL DATABASE LO ATTIVO SOLO UNA VOLTA
- */
 
-app.get('/create/', function(request, response) {
-	response.writeHead(200, {'Content-Type': 'text/html'});	
-	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-	var query_create='CREATE TABLE utente_registrato(id_utente INT,username text NOT NULL,password text,email text,PRIMARY KEY (username));CREATE TABLE bus (n_bus INT NOT NULL,orario text,posti_disponibili int,partenza text,destinazione text,PRIMARY KEY (n_bus));CREATE TABLE prenota(username text NOT NULL,n_bus INT NOT NULL,posto text,orario text,partenza text,destinazione text,PRIMARY KEY (username, n_bus),FOREIGN KEY (username) REFERENCES utente_registrato (username),FOREIGN KEY (n_bus) REFERENCES bus (n_bus));'
-			
-		client.query(query_create, function(err, result) {
-		  done();
-			
-		  if (err){ 
-			   console.error(err); 
-			   response.send("Errore " + err); 
-		   }
-		  else{ 
-              //MESSAGGIO DI RISPOSTA
-			  response.end("table created");
-		   }
-		});
-
-  	});
- });
 
 /**
  * @brief POST IN CUI REGISTRA UN NUOVO ACCOUNT

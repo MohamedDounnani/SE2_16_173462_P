@@ -1,0 +1,230 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "STUDENTI UNITN CARD",
+        "description": "Definition of API in the project",
+        "version": "1.0.0"
+    },
+    "host": "infinite-coast-33422.herokuapp.com",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/",
+    "produces": [
+        "application/json",
+        "text"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Viene visualizzata la pagina",
+                "description": "Mostra una pagina con dei bottoni ed un form per registrarsi o loggare",
+                "responses": {
+                    "200": {
+                        "description": "Succesfully returned"
+                    },
+                    "500": {
+                        "description": "Generic error"
+                    }
+                }
+            }
+        },
+        "/registrazione": {
+            "post": {
+                "summary": "Pagina di registrazione",
+                "description": "Manda ad una pagina di registrazione, in cui è possibile compilare un form",
+                "responses": {
+                    "200": {
+                        "description": "Succesfully returns the right page"
+                    },
+                    "500": {
+                        "description": "Generic error"
+                    }
+                }
+            }
+        },
+        "/login_home": {
+            "post": {
+                "summary": "logIn",
+                "description": "Ha bisogno di un username e password, se non esistono torna alla pagina principale",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "username",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "password",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succesfully logged in or homepage "
+                    },
+                    "500": {
+                        "description": "Generic or database error"
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "summary": "Dopo aver compilato il form di registrazione, memorizza i dati nel database",
+                "description": "Ha bisogno che il form di registrazione sia completo e non ci sia nessun campo vuoto",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "username",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "password",
+                        "required": true,
+                        "type": "string"
+                      
+                    },
+                    {
+                        "name": "repeat_password",
+                        "in": "formData",
+                        "description": "password",
+                        "required": true,
+                        "type": "string"
+                      
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succesfully logged in or homepage "
+                    },
+                    "500": {
+                        "description": "Generic or database error"
+                    }
+                }
+            }
+        },
+        "/prenotazione": {
+            "post": {
+                "summary": "Prenota un bus",
+                "description": "Visualizza un form, dove è possibile prenotare un posto in bus e una tabella con i vari orari",
+                "responses": {
+                    "200": {
+                        "description": "Succesfully returned"
+                    },
+                    "500": {
+                        "description": "Generic or database error"
+                    }
+                }
+            }
+        },
+        "/prenotazione_effettuata": {
+            "post": {
+                "summary": "Dopo aver compilato il form di prenotazione, memorizza i dati nel database",
+                "description": "Ha bisogno che il form di prenotazione sia compilato",
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "formData",
+                        "description": "partenza del bus",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "destination",
+                        "in": "formData",
+                        "description": "arrivo del bus",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "la data della partenza",
+                        "required": true,
+                        "type": "string"
+                      
+                    },
+                  ],
+                "responses": {
+                    "200": {
+                        "description": "Succesfully returned "
+                    },
+                    "500": {
+                        "description": "Generic or database error"
+                    }
+                }
+            }
+        },
+        "/my_prenotazione": {
+            "post": {
+                "summary": "Una pagina in cui è possibile vedere le proprie prenotazioni",
+                "description": "Registra ogni prenotazione effettuata dall'account. Crea ua tabella dove vengono mostrate le prenotazioni",
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "formData",
+                        "description": "partenza del bus",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "destination",
+                        "in": "formData",
+                        "description": "arrivo del bus",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "la data della partenza",
+                        "required": true,
+                        "type": "string"
+                      
+                    },
+                  ],
+                "responses": {
+                    "200": {
+                        "description": "Succesfully returned "
+                    },
+                    "500": {
+                        "description": "Generic or database error"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "summary": "Distrugge la sessione corrente",
+                "description": "Setta req.session.user_id a null e visualizza la homepage iniziale",
+                "responses": {
+                    "200": {
+                        "description": "Succesfully destroyed the session and returned the main page"
+                    },
+                    "500": {
+                        "description": "Generic error"
+                    }
+                }
+            }
+        }
+    }
+}
