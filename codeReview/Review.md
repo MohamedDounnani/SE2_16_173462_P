@@ -60,7 +60,7 @@ Segue il template per la code review fornito a lezione
 - [ ]	Script blocks are externalized to .js files (Mixed: there is both inline and externalized js)
 - [ ]	Consistent naming conventions are used 
 - [ ]	Core page features function with JavaScript disabled
-- [X ]	Script blocks are placed before the closing <body> tag
+- [X]	Script blocks are placed before the closing <body> tag
 - [ ]	Code has been run through JSHint (jshint.com) (No: 7 warnings)
 
 ## Code Base Checks
