@@ -21,7 +21,7 @@ app.use(session({
 	cookie: { maxAge: 1000000 }
 }));
 /**
- * @brief GET PER GLI  SCRIPT DI CONTROLLO DI  USERMANAGER E DELL'IMMAGINE 
+ * @brief GET PER GLI  SCRIPT DI CONTROLLO E DELL'IMMAGINE 
  */
 
 app.get('/controlhome.js' , function(req,res){
