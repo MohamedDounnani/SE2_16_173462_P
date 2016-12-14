@@ -1,0 +1,2 @@
+select n_bus,orario from bus WHERE partenza = start & destinazione = destination & orario = date;
+insert into prenota values (username,n_bus,orario);
