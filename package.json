@@ -4,8 +4,8 @@
   "description": "\"# SE2_16_173462_P\" \r PER ACCEDERE ALL'APPLICAZIONE COLLEGARSI A QUESTO SITO\r https://fathomless-inlet-80073.herokuapp.com",
   "main": "userManager.js",
   "scripts": {
-   "test": "./node_modules/.bin/jasmine-node spec"
-     
+   "test": "./node_modules/.bin/jasmine-node spec",
+   "start": "node userManager.js" 
   },
   "repository": {
     "type": "git",
