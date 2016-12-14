@@ -24,21 +24,6 @@ app.use(session({
  * @brief GET PER GLI  SCRIPT DI CONTROLLO DI  USERMANAGER E DELL'IMMAGINE 
  */
 
-app.get('/userManager.js' , function(req,res){
-    res.sendFile('userManager.js' , {root: __dirname})
-    });
-app.get('/controlhome.js' , function(req,res){
-    res.sendFile('home/controlhome.js' , {root: __dirname})
-    });
-app.get('/controlreg.js' , function(req,res){
-    res.sendFile('registrazione/controlreg.js' , {root: __dirname})
-    });
-app.get('/controllo_pre_reg.js' , function(req,res){
-    res.sendFile('prenotazione/controllo_pre_reg.js' , {root: __dirname})
-    });
-app.get('/style.css', function(req,res){
-    res.sendFile('registrazione/style.css', {root: __dirname})
-});
 app.get('/immagine.png', function(req,res){
     res.sendFile('img/immagine.png', {root: __dirname})
 });
