@@ -322,7 +322,7 @@ function prenota_values(start,destination,date,callback) {
         var orario;
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
 		//add element
-        console.log("start: "+start+"destination: "+destination+" date: "+date);
+        console.log("start: "+start+" destination: "+destination+" date: "+date);
 		client.query({text: 'select n_bus , orario from bus WHERE partenza = $1 and destinazione = $2 and orario = $3',
 			values: [start , destination, date]}, function(err, result) {
 		  done();
