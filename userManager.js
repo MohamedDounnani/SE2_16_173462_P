@@ -217,7 +217,7 @@ app.use('/prenotazione_effettuata/', function(request, response) {
     var posto = '';
    	response.writeHead(200, {'Content-Type': 'text/html'});	
     controllo_prenotazione(start,destination,date, function(exist){    
-    if(!exist){
+    if(exist){
 	 prenota_values(start,destination,date,function(n_bus,orario){
               pg.connect(process.env.DATABASE_URL , function(err, client, done) {		            
 		          //add element
