@@ -48,6 +48,9 @@ app.use('/registrazione' , function(req,res){
     res.sendFile('registrazione/registrazione.html' , {root: __dirname})
     });
 
+/**
+ * @brief POST CHE RICHIAMA LA PAGINA DI ERRORE 
+ */
 app.use('/error' , function(req,res){
     res.sendFile('errore/error.html' , {root: __dirname})
     });
@@ -219,10 +222,12 @@ app.use('/prenotazione_effettuata/', function(request, response) {
     var date=request.body.prenotazione_reg_date;
     var destination=request.body.prenotazione_reg_destination;
     var posto = '';
-   	
+    controlla_se_hai_già_prenotato(request.session.user_id,start,destination,date,function(esistegia){
+    if(!esistegia){
+   	//controllo prenotazione controlla che la prenotazione esista, cioè che i dati sono corretti
     controllo_prenotazione(start,destination,date, function(exist){    
     if(exist){
-        response.writeHead(200, {'Content-Type': 'text/html'});	
+        response.writeHead(200, {'Content-Type': 'text/html'});	        
 	 prenota_values(start,destination,date,function(n_bus,orario){
               pg.connect(process.env.DATABASE_URL , function(err, client, done) {		            
 		          //add element
@@ -255,6 +260,14 @@ app.use('/prenotazione_effettuata/', function(request, response) {
         response.redirect('/error');
         
     }
+    });
+    }
+    else {
+        
+        response.redirect('/error');
+        
+    }
+
     });
     
    
@@ -327,6 +340,34 @@ function lunghezza(callback) {
 		});
   	});
 }
+/**
+ * @brief FUNZIONE CHE CONTROLLA SE ESISTE GIA' UNA PRENOTAZIONE CON QUESTO NOME
+ * @param FUNZIONE DI CALLBACK PER SINCRONIZZARE GLI ACCESSI AL DATABASE, RESTITUENDO IL NUMERO DI RIGHE DA USARE COME NUOVO ID
+ */
+
+function controlla_se_hai_già_prenotato(user,start,destination,date,callback){
+        var esistegia;
+        pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
+		//add element
+        console.log("start: "+start+" destination: "+destination+" date: "+date);
+		client.query({text: 'select username, partenza , destinazione , orario from bus WHERE username = $1 partenza = $2 and destinazione = $3 and orario = $4',
+			values: [user , start , destination, date]}, function(err, result) {
+		  done();
+          if(result.rows.length>0){
+              
+              esistegia=true;
+              callback(esistegia);
+        
+          }
+		  else { 
+              esistegia=false;
+			  callback(esistegia);
+		   }
+		});
+  	});    
+    
+    
+}
 
 /**
  * @brief FUNZIONE CHE RESTITUISCE N_BUS ORARIO DOVE START DESTINATION E DATE RICHIESTI COINCIDONO CON IL BUS
@@ -355,6 +396,10 @@ function prenota_values(start,destination,date,callback) {
   	});    
 }
 
+/**
+ * @brief FUNZIONE CHE CONTROLLA SE I PARAMETRI SONO CORRETTI, CIOE' SE ESISTE LA START DESTINATION ECC
+ * @param START, DESTINATION, DATE , CALLBACK
+ */
 function controllo_prenotazione(start,destination,date,callback) {    
         var exist;        
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
