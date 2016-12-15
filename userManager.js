@@ -247,7 +247,7 @@ app.use('/prenotazione_effettuata/', function(request, response) {
     
     }
     else {
-        response.writeHead(200, {'Content-Type': 'text/html'});	
+        
         response.send("Errore inserimento");
         
     }
