@@ -350,7 +350,7 @@ function controlla_se_hai_già_prenotato(user,start,destination,date,callback){
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
 		//add element
         console.log("start: "+start+" destination: "+destination+" date: "+date);
-		client.query({text: 'select username, partenza , destinazione , orario from bus WHERE username = $1 partenza = $2 and destinazione = $3 and orario = $4',
+		client.query({text: 'select username, partenza , destinazione , orario from bus WHERE username = $1 and partenza = $2 and destinazione = $3 and orario = $4',
 			values: [user , start , destination, date]}, function(err, result) {
 		  done();
           if(result.rows.length>0){
