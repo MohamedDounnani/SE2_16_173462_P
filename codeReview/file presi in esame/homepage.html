@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>homepage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="stile.css" type="text/css" />
+    <script src="script.js"></script> 
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="superiore col-md-2 col-sm-2 col-xs-2"></div>
+        <div class="superiore col-md-8 col-sm-8 col-xs-8">
+          <p id="titolo">HOME FOOD</p>
+        </div>
+        <div class="superiore col-md-2 col-sm-2 col-xs-2"></div>
+      </div>
+      <div class="row">
+        <div class="sinistro col-md-3 col-sm-3 col-xs-3"></div>
+        <div class="centrale col-md-6 col-sm-6 col-xs-6">
+          <a href="/caricagiorni">
+            <button id="ordinazione" type="button" class="verde">
+              <strong>ORDINAZIONE</strong><br>Con consegna a domicilio
+            </button>	
+          </a>
+        </div>
+        <div class="destro col-md-3 col-sm-3 col-xs-3"></div>
+      </div><br>
+      <div class="row">
+        <div class="sinistro col-md-4 col-sm-4 col-xs-4">
+          <button id="chat" type="button" class="azzurro"><strong>CHAT</strong><br>Contatta un esperto per consigli</button>
+        </div>
+        <div class="centrale col-md-4 col-sm-4 col-xs-4"><br>
+          <div id="sviluppo" class="alert alert-danger testo_entrata" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            Questa parte dell'applicazione e' ancora in sviluppo, prova un'ordinazione
+          </div>
+        </div>
+        <div class="destro col-md-4 col-sm-4 col-xs-4">
+          <button id="info" type="button" class="azzurro"><strong>CONTATTI</strong></button>
+        </div>
+      </div>
+    </div>
+    (: script :) <!-- se arrivo dal completamento di un ordine avviso l'utente -->
+  </body>
+</html>

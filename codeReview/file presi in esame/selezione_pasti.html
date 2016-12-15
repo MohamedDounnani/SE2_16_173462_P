@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>pasti</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="stile.css" type="text/css" />
+    <script src="script.js"></script> 
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="superiore col-md-2 col-sm-2 col-xs-2"></div>
+        <div class="superiore col-md-8 col-sm-8 col-xs-8">
+          <p id="titolo2">
+            SCEGLI LE PIETANZE PER<BR>I GIORNI SCELTI
+          </p>
+        </div>
+        <div class="superiore col-md-2 col-sm-2 col-xs-2"></div>
+      </div>
+      <form name="form_scelte" method="post">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Primo</th>
+              <th>Secondo</th>
+              <th>Contorno</th>
+              <th>Dessert</th>
+            </tr>
+          </thead>
+          (: tbody :) <!-- mostro le pietanze per i giorni scelti dall'utente -->
+        </table>
+      </form>
+      <div class="row">
+        <div class="sinistro col-md-2 col-sm-2 col-xs-2"></div>
+        <div class="centrale col-md-8 col-sm-8 col-xs-8">
+          <div class="alert alert-info" role="alert">
+            Per fare una ricerca sulle pietanze premi due volte rapidamente sulla casella interessata
+          </div>
+          <div class="bottone_alert alert alert-warning alert-dismissable">
+            <button id="chiudi_alert" type="button" class="close">&times;</button>
+            <strong>Attenzione!</strong> Devi selezionare almeno una pietanza per proseguire
+          </div>
+          <p class="conferma">
+            CONFERMA LA SCELTA FATTA 
+            <button onclick="post_request.invia_dati()" class="btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+          </p>
+        </div>
+        <div class="destro col-md-2 col-sm-2 col-xs-2"></div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="sinistro col-md-2 col-sm-2 col-xs-2"></div>
+        <div class="centrale col-md-5 col-sm-5 col-xs-5"></div>
+        <div class="destro col-md-2 col-sm-2 col-xs-2">
+          <a href="/" class="btn btn-primary btn-lg">
+            <span class="glyphicon glyphicon-home"></span>
+            Homepage 
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
