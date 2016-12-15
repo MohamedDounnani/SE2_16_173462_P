@@ -48,6 +48,10 @@ app.use('/registrazione' , function(req,res){
     res.sendFile('registrazione/registrazione.html' , {root: __dirname})
     });
 
+app.use('/error' , function(req,res){
+    res.sendFile('errore/error.html' , {root: __dirname})
+    });
+
 /**
  * @brief GET CHE GESTISCE LA PAGINA PRINCIPALE AL PRIMO AVVIO SE C'è GIA UNA SESSIONE ATTIVA MANDA AL LOGIN.TPL ALTRIMENTI MANDA ALLA PAGINA PRINCIPALE 
  */
@@ -248,7 +252,7 @@ app.use('/prenotazione_effettuata/', function(request, response) {
     }
     else {
         
-        response.send("Errore inserimento");
+        response.redirect('/error');
         
     }
     });
