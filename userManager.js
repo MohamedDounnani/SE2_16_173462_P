@@ -216,8 +216,8 @@ app.use('/prenotazione_effettuata/', function(request, response) {
     var destination=request.body.prenotazione_reg_destination;
     var posto = '';
    	response.writeHead(200, {'Content-Type': 'text/html'});	
-    controllo_prenotazione(start,destination,data, function(exist){    
-    if(exist){
+    controllo_prenotazione(start,destination,date, function(exist){    
+    if(!exist){
 	 prenota_values(start,destination,date,function(n_bus,orario){
               pg.connect(process.env.DATABASE_URL , function(err, client, done) {		            
 		          //add element
@@ -251,6 +251,8 @@ app.use('/prenotazione_effettuata/', function(request, response) {
         
     }
     });
+    
+   
 
 });
 
@@ -349,8 +351,7 @@ function prenota_values(start,destination,date,callback) {
 }
 
 function controllo_prenotazione(start,destination,date,callback) {    
-        var exist;
-        
+        var exist;        
         pg.connect(process.env.DATABASE_URL, function(err, client, done) {		
 		//add element
         
@@ -358,13 +359,12 @@ function controllo_prenotazione(start,destination,date,callback) {
 			values: [start , destination, date]}, function(err, result) {
 		  done();
           if(result.rows.length>0){
-              
               exist=true;
-              callback(true);
+              callback(exist);
           }
           else {
               exist = false;
-              callback(false);
+              callback(exist);
           }
           
 		});
