@@ -97,10 +97,6 @@ app.use('/register/', function(request, response) {
 	var username =request.body.username_reg;
     var password=request.body.password_reg;
     var email=request.body.email_reg;   
-    
-    //VARIABILE USATA PER CONTROLLARE SE ESISTE GIA' UN USERNAME CON LO STESSO NOME DEL DATABASE
-    var username_exist;
-	    
     //FUNZIONE CHE CONTROLLA SE CI SIA UN ALTRO ACCOUNT CON LO STESSO USERNAME, SE COSI FOSSE RIMANDA ALLA PAGINA PRINCIPALE + FUNZIONE DI CALLBACK PER //ESTRAPOLARE LA LUNGHEZZA DELLA TABELLA DA USARE COME USER_ID
     findusername(username,function(username_exist){
     lunghezza(function(count){
