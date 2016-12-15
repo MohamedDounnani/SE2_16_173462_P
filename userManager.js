@@ -222,6 +222,7 @@ app.use('/prenotazione_effettuata/', function(request, response) {
     var date=request.body.prenotazione_reg_date;
     var destination=request.body.prenotazione_reg_destination;
     var posto = '';
+    //controlla_se_hai_già_prenotato controlla se hai già prenotato in precedenza
     controlla_se_hai_già_prenotato(request.session.user_id,start,destination,date,function(esistegia){
     if(!esistegia){
    	//controllo prenotazione controlla che la prenotazione esista, cioè che i dati sono corretti
